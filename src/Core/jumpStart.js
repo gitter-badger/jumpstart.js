@@ -1,38 +1,29 @@
 'use strict';
 
 /**
- * JumpStart Object.
+ * JumpStart service.
+ * @module core
  */
-var js = function(){
-};
-
-/**
-* Version info for JumpStart.
-* @type {*}
-*/
-js.version = {
- // These placeholder strings will be replaced by grunt's `build` task.
- full: '"JS_VERSION_FULL"'
-};
-
-/**
- * Options.
- */
-js.options = {
-  mobile: false,
-  suppressNextError: false,
-  guiAllowed: true  
-};
-
-/**
- * JumpStart functions module.
- * @module fn
- */
-js.fn = (function() {
+var $js = (function() {
 
   var uid = 1;
 
   return {
+
+    /**
+     * Version info for JumpStart.
+     * @type {object}
+     */
+    version: {
+      // These placeholder strings will be replaced by grunt's `build` task.
+      full: '"JS_VERSION_FULL"'
+    },
+
+    mobile: false,
+
+    suppressNextError: false,
+
+    guiAllowed: true,
 
     /**
      * A function that performs no operations.
@@ -224,7 +215,7 @@ js.fn = (function() {
       loaderHelper.hide();
 
       $log.error('Application Error: ' + msg);
-      $event.fire('Error', msg);
+      js.event.fire('Error', msg);
 
       $code.onerror();
 
@@ -253,3 +244,8 @@ js.fn = (function() {
   };
 
 })();
+
+/**
+ * A reference to the browsers window object. Allows us to mock the window during testing.
+ */
+var $window = $js.valueFn(window)();

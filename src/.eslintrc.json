@@ -8,6 +8,6 @@
     "$": false,
     "jQuery": false,
     "swal": false,
-    "$js": false
+    "js": false
   }
 }
