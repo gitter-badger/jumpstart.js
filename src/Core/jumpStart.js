@@ -1,29 +1,38 @@
 'use strict';
 
 /**
- * JumpStart service.
- * @module core
+ * JumpStart Object.
  */
-var $js = (function() {
+var js = function(){
+};
+
+/**
+* Version info for JumpStart.
+* @type {*}
+*/
+js.version = {
+ // These placeholder strings will be replaced by grunt's `build` task.
+ full: '"JS_VERSION_FULL"'
+};
+
+/**
+ * Options.
+ */
+js.options = {
+  mobile: false,
+  suppressNextError: false,
+  guiAllowed: true  
+};
+
+/**
+ * JumpStart functions module.
+ * @module fn
+ */
+js.fn = (function() {
 
   var uid = 1;
 
   return {
-
-    /**
-     * Version info for JumpStart.
-     * @type {object}
-     */
-    version: {
-      // These placeholder strings will be replaced by grunt's `build` task.
-      full: '"JS_VERSION_FULL"'
-    },
-
-    mobile: false,
-
-    suppressNextError: false,
-
-    guiAllowed: true,
 
     /**
      * A function that performs no operations.
@@ -244,8 +253,3 @@ var $js = (function() {
   };
 
 })();
-
-/**
- * A reference to the browsers window object. Allows us to mock the window during testing.
- */
-var $window = $js.valueFn(window)();

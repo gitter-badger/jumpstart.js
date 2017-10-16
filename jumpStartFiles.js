@@ -3,6 +3,7 @@
 var jumpStartFiles = {
 
   'jumpStartCore': [
+    'src/Core/jumpStart.js',
     'src/Core/logHelper.js',
     'src/Core/eventHelper.js',
     'src/Core/loaderHelper.js',
@@ -13,7 +14,7 @@ var jumpStartFiles = {
     'src/Core/page.js',
     'src/Core/table.js',
     'src/Core/appHelper.js',
-    'src/Core/jumpStart.js'
+    'src/Core/defineJumpStart.js'
   ],
 
   'jumpStartComponents': [
