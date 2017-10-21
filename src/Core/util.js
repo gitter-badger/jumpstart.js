@@ -1,11 +1,11 @@
 'use strict';
 
 /**
- * Util Module.
+ * Utility functions module.
  * @module core
- * 
- * Private module. Various helper functions.
- * 
+ *
+ * Private module. Various utility functions.
+ *
  */
 var util = (function() {
 
@@ -21,6 +21,7 @@ var util = (function() {
 
     /**
      * Returns a pre-instantiated object as a function.
+     * @returns {*}
      */
     valueFn: function(value) {
       return function valueRef() {
@@ -30,25 +31,33 @@ var util = (function() {
 
     /**
      * Get the next unique id.
-     * @returns {number} The next unqiue id.
+     * @returns {number}
      */
     nextID: function() {
       return uid++;
     },
 
+    /**
+     * Check for HTML5 compatability.
+     * @returns {boolean}
+     */
     html5Check: function() {
-      return $js.window.document.addEventListener;
+      return $window.document.addEventListener;
     },
 
+    /**
+     * Check is the current display is mobile sized. Requires JQuery.
+     * @returns {boolean}
+     */
     isMobileDisplay: function() {
-      return $($js.window).width() <= 650;
+      return $($window).width() <= 650;
     },
 
     /**
      * Format a string.
      * @param {string} str - String to format.
      * @param {...*} args - Values to add to formatted string.
-     * @returns {string} Formatted string.
+     * @returns {string}
      */
     formatString: function(str, args) {
       var a = arguments;
@@ -58,11 +67,17 @@ var util = (function() {
       });
     },
 
+    /**
+     * Extend an object with another object.
+     * @param {*} me - Object to extend.
+     * @param {*} withthis - Object to extend with.
+     * @returns {*}
+     */
     extend: function(me, withthis) {
       if (withthis && me)
         for (var i in withthis) {
           if (typeof withthis[i] === 'object') {
-            $js.extend(me[i], withthis[i]);
+            util.extend(me[i], withthis[i]);
           } else {
             me[i] = withthis[i];
           }
@@ -70,6 +85,13 @@ var util = (function() {
       return me;
     },
 
+    /**
+     * Iterate through an array or object.
+     * @param {*} obj - Object to iterate through.
+     * @param {function} iterator - Iterator function to call.
+     * @param {*} context - Context to run the iterator function.
+     * @returns {*}
+     */
     forEach: function(obj, iterator, context) {
       var key, length;
       if (obj) {
@@ -80,7 +102,7 @@ var util = (function() {
               iterator.call(context, obj[key], key, obj);
             }
           }
-        } else if (obj.forEach && obj.forEach !== $js.forEach) {
+        } else if (obj.forEach && obj.forEach !== util.forEach) {
           obj.forEach(iterator, context, obj);
         } else if (typeof obj.hasOwnProperty === 'function') {
           for (key in obj)
@@ -95,6 +117,10 @@ var util = (function() {
       return obj;
     },
 
+    /**
+     * Run a function and silence any errors.
+     * @param {function} func - Function to run.
+     */
     noThrow: function(func) {
       try {
         return func && func();
@@ -102,7 +128,11 @@ var util = (function() {
     },
 
     /**
-     * Add an element (native)
+     * Add an element (native).
+     * @param {string} type - Element type to create.
+     * @param {*} attributes - Attributes to add to the element.
+     * @param {*} parentElement - Parent element to append to.
+     * @returns {*}
      */
     addElement: function(type, attributes, parentElement) {
 
@@ -116,35 +146,6 @@ var util = (function() {
       return element;
     },
 
-    ready: contentLoaded,
-
-    handlers: {
-      message: function(msg, callback, title) {
-
-        // Show a simple alert.
-        $window.alert(msg);
-        if (callback)
-          callback();
-      },
-      confirm: function(msg, callback, title, yescaption, nocaption) {
-
-        // Show a simple confirmation.
-        var ret = $window.confirm(msg);
-        if (callback)
-          callback(ret);
-      },
-      error: function(msg) {
-
-        // Add error to body if it is loaded...
-        if ($window.document.body) {
-          $window.document.body.innerHTML = '<div style="padding: 30px; ' +
-            'overflow-wrap: break-word;"><h1>Oops, we had an issue</h1>' + msg + '</div>';
-        } else {
-          $js.handlers.message(msg);
-        }
-      }
-    },
-
     /**
      * Show an alert dialog.
      * @param {string} msg - Message to display.
@@ -152,14 +153,18 @@ var util = (function() {
      * @param {string} [title="Application Message"] - Title of the dialog.
      */
     message: function(msg, callbackFn, title) {
+      
+      // If there is no gui, just run the callback.
       if (!$js.guiAllowed) {
         if (callbackFn)
           $code.setZeroTimeout(callbackFn);
         return;
       }
+      
       title = title || 'Application Message';
-      if ($js.handlers.message)
-        return $js.handlers.message.apply(null, arguments);
+      
+      // Fire the event.
+      $event.fire('js.message', msg, callbackFn, title);
     },
 
     /**
@@ -171,14 +176,18 @@ var util = (function() {
      * @param {string} [nocaption="Cancel"] - Caption of the "no" button.
      */
     confirm: function(msg, callbackFn, title, yescaption, nocaption) {
+        
+      // If there is no gui, just run the callback.
       if (!$js.guiAllowed) {
         if (callbackFn)
           $code.setZeroTimeout(callbackFn);
         return;
       }
+      
       title = title || 'Application Confirmation';
-      if ($js.handlers.confirm)
-        return $js.handlers.confirm.apply(null, arguments);
+      
+      // Fire the event.
+      $event.fire('js.confirm', msg, callbackFn, title, yescaption, nocaption)
     },
 
     /**
@@ -193,26 +202,24 @@ var util = (function() {
       // Merge string.
       if (typeof msg === 'string') {
         var arr = [msg];
-        $js.forEach(arguments, function(a, i) {
+        util.forEach(arguments, function(a, i) {
           if (i > 0)
             arr.push(a);
         });
-        msg = $js.formatString.apply(null, arr);
+        msg = util.formatString.apply(null, arr);
       }
 
-      loaderHelper.hide();
+      browserProgress.hide();
 
       $log.error('Application Error: ' + msg);
-      js.event.fire('Error', msg);
-
+      $event.fire('on.error', msg);
       $code.onerror();
 
       // Run error handling.
       if (!$js.suppressNextError) {
 
-        // Run the error handler.
-        if ($js.handlers.error)
-          $js.handlers.error(msg);
+        // Run the event.
+        $event.fire('js.error', msg);
 
         // Kill execution.
         throw new Error('ERROR_HANDLED');
